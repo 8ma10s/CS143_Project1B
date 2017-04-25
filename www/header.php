@@ -18,7 +18,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
 	  </button>
-	  <a class="navbar-brand" href="#">BMDb</a>
+	  <a class="navbar-brand" href="./index.php">BMDb</a>
 	</div>
 
 	<!-- Collect the nav links, forms, and other content for toggling -->
@@ -45,5 +45,5 @@
 	</div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
     </nav>
-    <div class="container-fluid">
+    <div class="container">
       
