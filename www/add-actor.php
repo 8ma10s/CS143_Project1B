@@ -2,6 +2,12 @@
 
 <div class="row">
   <h2>Add New Actor</h2>
+  <?php if (!empty($_GET['firstName'])): ?>
+    <div class="alert alert-success alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" ><span>&times;</span></button>
+      <strong>Success!</strong> Actor added to database.
+    </div>
+  <?php endif; ?>
   <form method="GET" action="#">
     <div class="form-group">
       <label for="firstName">First Names</label>
