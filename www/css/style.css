@@ -1,0 +1,12 @@
+.star {
+  font-size: 17px;
+  margin-right: -3px;
+}
+
+.star-selected {
+  color: #edb867;
+}
+
+.star-deselected {
+  color: #d2d2d2;
+}

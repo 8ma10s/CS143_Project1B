@@ -5,6 +5,11 @@
     <link rel="stylesheet" href="./css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/select2.min.css">
     <link rel="stylesheet" href="./css/select2-bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+
+    <?php if (!empty($customStyles)) {
+      echo $customStyles;
+    } ?>
 
     <script src="./js/jquery-3.2.1.min.js"></script>
     <script src="./js/bootstrap.min.js"></script>
@@ -39,9 +44,9 @@
               </ul>
             </li>
 	  </ul>
-	  <form class="navbar-form navbar-left">
+	  <form class="navbar-form navbar-left" method="GET" action="./search.php">
             <div class="form-group">
-              <input type="text" class="form-control" placeholder="Search">
+              <input name="query" type="text" class="form-control" placeholder="Search">
             </div>
             <button type="submit" class="btn btn-default">Submit</button>
 	  </form>
