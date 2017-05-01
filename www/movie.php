@@ -7,6 +7,20 @@ $customStyles = '<link rel="stylesheet" href="./css/bootstrap-stars.css">';
 <?php include 'header.php'; ?>
 
 <?php
+function ratingToStars($rating) {
+  $stars = "";
+  $selectedStar = '<span class="glyphicon glyphicon-star star star-selected" aria-hidden="true"></span>';
+  $deselectedStar = '<span class="glyphicon glyphicon-star star star-deselected" aria-hidden="true"></span>';
+  $starIndex = 0;
+  for (; $starIndex < $rating; $starIndex++) {
+    $stars .= $selectedStar;
+  }
+  for (; $starIndex < 10; $starIndex++) {
+    $stars .= $deselectedStar;
+  }
+  return $stars;
+}
+
 $isValid = true;
 if (!empty($_GET['id'])) {
   $movieID = $_GET['id'];
@@ -45,6 +59,36 @@ WHERE Movie.id = $movieID
 AND MovieActor.mid = Movie.id 
 AND MovieActor.aid = Actor.id";
   $actorsResults = mysql_query($actorsQuery, $db_connection);
+
+  // check if review posted
+  if (!empty($_POST['reviewerName'])) {
+    $didReview = true;
+    $reviewerName = $_POST['reviewerName'];
+    $reviewRating = $_POST['reviewRating'];
+    $reviewComment = $_POST['reviewComment'];
+    $date = date('Y-m-d H:i:s');
+
+    $insertReviewQuery = "INSERT INTO Review (name, time, mid, rating, comment)
+VALUES ('$reviewerName', '$date', '$movieID', '$reviewRating', '$reviewComment')";
+    if (mysql_query($insertReviewQuery, $db_connection)) {
+      $reviewSuccessful = true;
+    }
+    else {
+      $reviewSuccessful = false;
+    }
+  }
+
+  // Reviews
+  $reviewsQuery = "SELECT * FROM Review WHERE mid = $movieID ORDER BY time";
+  $reviewsResults = mysql_query($reviewsQuery, $db_connection);
+
+  // Average review rating
+  $avgRatingQuery = "SELECT IFNULL(AVG(rating), 0) as avgRating FROM Review WHERE mid = $movieID";
+  $avgRatingResults = mysql_query($avgRatingQuery, $db_connection);
+  $averageRating = 0;
+  if ($row = mysql_fetch_assoc($avgRatingResults)) {
+    $averageRating = $row['avgRating'];
+  }
 }
 else {
   $isValid = false;
@@ -52,7 +96,7 @@ else {
 
 mysql_close($db_connection);
 ?>
-
+<?php if ($isValid): ?>
 <div class="row">
   <div class="page-header">
     <h1><?php echo $movieInfo['title'].' ('.$movieInfo['year'].')'; ?></h1>
@@ -103,42 +147,42 @@ mysql_close($db_connection);
 
 <div class="row">
   <h2>User Reviews</h2>
-  <div class="panel panel-default">
-    <div class="panel-body">
-      <span class="h5">Reviewer Name:</span>
-      asdf
-      <br />
-      <span class="h5">Date:</span>
-      2017-01-01
-      <br />
-      <span class="h5">Rating:</span>
-      <span class="glyphicon glyphicon-star star star-selected" aria-hidden="true"></span>
-      <span class="glyphicon glyphicon-star star star-deselected" aria-hidden="true"></span>
-      <span class="glyphicon glyphicon-star star star-deselected" aria-hidden="true"></span>
-      <span class="glyphicon glyphicon-star star star-deselected" aria-hidden="true"></span>
-      <span class="glyphicon glyphicon-star star star-deselected" aria-hidden="true"></span>
-      <h5>Comment:</h5>
-      <p>asdf</p>
+  <span class="h4">Average Rating: <?php echo $averageRating; ?>/10</span>
+  
+  <br />
+  <br />
+  <?php while ($row = mysql_fetch_assoc($reviewsResults)): ?>
+    <div class="panel panel-default">
+      <div class="panel-body">
+	<span class="h5">Reviewer Name:</span>
+	<?php echo $row['name']; ?>
+	<br />
+	<span class="h5">Date:</span>
+	<?php echo $row['time']; ?>
+	<br />
+	<span class="h5">Rating:</span>
+	<?php echo ratingToStars($row['rating']); ?>
+	<h5>Comment:</h5>
+	<p><?php echo $row['comment']; ?></p>
+      </div>
     </div>
-  </div>
-  <div class="panel panel-default">
-    <div class="panel-body">
-      <span class="h5">Reviewer Name:</span>
-      asdf
-      <br />
-      <span class="h5">Date:</span>
-      2017-01-01
-      <br />
-      <span class="h5">Rating:</span>
-      <span class="glyphicon glyphicon-star star star-selected" aria-hidden="true"></span>
-      <span class="glyphicon glyphicon-star star star-deselected" aria-hidden="true"></span>
-      <h5>Comment:</h5>
-      <p>asdf</p>
-    </div>
-  </div>
+  <?php endwhile; ?>
   
   <h3>Add Your Review</h3>
-  <form method="POST" action="#">
+
+  <?php if ($didReview && $reviewSuccessful): ?>
+    <div class="alert alert-success alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" ><span>&times;</span></button>
+      <strong>Success!</strong> Review submitted.
+    </div>
+  <?php elseif ($didReview): ?>
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" ><span>&times;</span></button>
+      <strong>Error!</strong> Review could not be submitted.
+    </div>
+  <?php endif; ?>
+  
+  <form id="submitReview" method="POST" action="#submitReview">
     <div class="form-group">
       <label for="reviewerName">Your Name</label>
       <input name="reviewerName" type="text" class="form-control" placeholder="Carlo Zaniolo">
@@ -166,6 +210,7 @@ mysql_close($db_connection);
   </form>
   
 </div>
+<?php endif; // isValid ?>
 
 <script src="./js/jquery.barrating.min.js"></script>
 <script type="text/javascript">
