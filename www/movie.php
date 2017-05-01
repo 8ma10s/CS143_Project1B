@@ -24,8 +24,26 @@ if (!empty($_GET['id'])) {
     $movieInfo = mysql_fetch_assoc($movieResults);
   }
 
+  // Genres
+  $genreQuery = "SELECT genre FROM MovieGenre WHERE mid = $movieID";
+  $genreResults = mysql_query($genreQuery, $db_connection);
+
+  // Director
+  $directorQuery = "SELECT Director.first as first, Director.last as last FROM MovieDirector, Director 
+WHERE MovieDirector.mid = $movieID 
+AND MovieDirector.did = Director.id";
+  $directorResults = mysql_query($directorQuery, $db_connection);
+  if ($row = mysql_fetch_assoc($directorResults)) {
+    $director = $row['first'].' '.$row['last'];
+  }
+  
+
   // Actors
-  $actorsQuery = "SELECT Actor.first as first, Actor.last as last, Actor.id as aid, MovieActor.role as role FROM Movie, MovieActor, Actor WHERE Movie.id = $movieID AND MovieActor.mid = Movie.id AND MovieActor.aid = Actor.id";
+  $actorsQuery = "SELECT Actor.first as first, Actor.last as last, Actor.id as aid, MovieActor.role as role 
+FROM Movie, MovieActor, Actor 
+WHERE Movie.id = $movieID 
+AND MovieActor.mid = Movie.id 
+AND MovieActor.aid = Actor.id";
   $actorsResults = mysql_query($actorsQuery, $db_connection);
 }
 else {
@@ -66,9 +84,19 @@ mysql_close($db_connection);
   <div class="col-md-3">
     <ul class="list-group">
       <li class="list-group-item"><strong>Producer: </strong><?php echo $movieInfo['company']; ?></li>
-      <li class="list-group-item"><strong>Director: </strong>asdf</li>
+      <li class="list-group-item"><strong>Director: </strong><?php echo $director; ?></li>
       <li class="list-group-item"><strong>MPAA Rating: </strong><?php echo $movieInfo['rating']; ?></li>
-      <li class="list-group-item"><strong>Genre: </strong>asdf</li>
+      <li class="list-group-item"><strong>Genres: </strong>
+	<?php
+	// first result doesn't have comma
+	if ($row = mysql_fetch_assoc($genreResults)) {
+	  echo $row['genre'];
+	}
+	while ($row = mysql_fetch_assoc($genreResults)) {
+	  echo ', '.$row['genre'];
+	}
+	?>
+      </li>
     </ul>
   </div>
 </div>
