@@ -1,4 +1,4 @@
-<?php include 'database.php' ?>
+<?php include 'database.php'; ?>
 
 <?php
 $isValid = true;
@@ -85,5 +85,5 @@ else {
   <?php endif; ?>
   
 </div>
-
-<?php include 'footer.php' ?>
+<?php mysql_close($db_connection); ?>
+<?php include 'footer.php'; ?>

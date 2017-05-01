@@ -1,20 +1,43 @@
+<?php include 'database.php'; ?>
 
 <?php
 $customStyles = '<link rel="stylesheet" href="./css/bootstrap-stars.css">';
 ?>
 
-<?php include 'header.php';?>
+<?php include 'header.php'; ?>
 
 <?php
+$isValid = true;
 if (!empty($_GET['id'])) {
-  $movieId = $_GET['id'];
+  $movieID = $_GET['id'];
+
+  $db_connection = connectToDB();
+
+  // Movie Info
+  $movieQuery = "SELECT * FROM Movie WHERE Movie.id = $movieID";
+  $movieResults =  mysql_query($movieQuery, $db_connection);
+  $numRows = mysql_num_rows($movieResults);
+  if ($numRows < 1) {
+    $isValid = false;
+  }
+  else {
+    $movieInfo = mysql_fetch_assoc($movieResults);
+  }
+
+  // Actors
+  $actorsQuery = "SELECT Actor.first as first, Actor.last as last, Actor.id as aid, MovieActor.role as role FROM Movie, MovieActor, Actor WHERE Movie.id = $movieID AND MovieActor.mid = Movie.id AND MovieActor.aid = Actor.id";
+  $actorsResults = mysql_query($actorsQuery, $db_connection);
+}
+else {
+  $isValid = false;
 }
 
+mysql_close($db_connection);
 ?>
 
 <div class="row">
   <div class="page-header">
-    <h1>Titanic (YEAR)</h1>
+    <h1><?php echo $movieInfo['title'].' ('.$movieInfo['year'].')'; ?></h1>
   </div>
 </div>
 
@@ -29,18 +52,22 @@ if (!empty($_GET['id'])) {
 	</tr>
       </thead>
       <tbody>
-	<tr>
-	  <td><a href="./actor.php?id=1">Johnny Depp</a></td>
-	  <td>The Iceberg</td>
-	</tr>
+	<?php
+	while ($row = mysql_fetch_assoc($actorsResults)) {
+	  echo '<tr>
+	<td><a href="./actor.php?id='.$row['aid'].'">'.$row['first'].' '.$row['last'].'</a></td>
+	<td>'.$row['role'].'</td>
+        </tr>';
+	}
+	?>
       </tbody>
     </table>
   </div>
   <div class="col-md-3">
     <ul class="list-group">
-      <li class="list-group-item"><strong>Producer: </strong>asdf</li>
+      <li class="list-group-item"><strong>Producer: </strong><?php echo $movieInfo['company']; ?></li>
       <li class="list-group-item"><strong>Director: </strong>asdf</li>
-      <li class="list-group-item"><strong>MPAA Rating: </strong>asdf</li>
+      <li class="list-group-item"><strong>MPAA Rating: </strong><?php echo $movieInfo['rating']; ?></li>
       <li class="list-group-item"><strong>Genre: </strong>asdf</li>
     </ul>
   </div>
@@ -121,4 +148,4 @@ if (!empty($_GET['id'])) {
  });
 </script>
 
-<?php include 'footer.php' ?>
+<?php include 'footer.php'; ?>
