@@ -20,16 +20,26 @@ if ($validSearch) {
   if ($validSearch):
     // make a string of "title LIKE [keyword]" ANDed with each other
     $movieKW = array();
+    $actorKW = array();
     foreach ($keywords as $key => $keyword){
       $movieKW[$key] = ' title LIKE "%'.$keyword.'%" ';
+      $actorKW[$key] = ' (last LIKE "%'.$keyword.'%" OR first LIKE "%'.$keyword.'%") ';
     }
     $movieCond = join('AND', $movieKW);
+    $actorCond = join('AND', $actorKW);
 
     //search movies
     $movieQuery = "SELECT id, title, year
     FROM Movie
     WHERE".$movieCond;
-    $movieResult = mysql_query($movieQuery, $db_connection); ?>
+    $movieResult = mysql_query($movieQuery, $db_connection);
+
+    $actorQuery = "SELECT id, first, last, IF(dob,DATE_FORMAT(dob,'%m-%d-%Y'),NULL)
+    FROM Actor
+    WHERE".$actorCond;
+    $actorResult = mysql_query($actorQuery, $db_connection);
+
+    ?>
     <h2>Showing Results For "<?php echo $query; ?>"</h2>
     <h3>Movies</h3>
     <table class="table table-hover">
@@ -43,6 +53,7 @@ if ($validSearch) {
         <?php
         // generate each row with Movie title and Year
         while($row = mysql_fetch_row($movieResult)): ?>
+        <?php $row = checkNull($row,'<i>no data</i>'); ?>
            <tr>
              <td>
                <!-- Moie name with link to the page of specific movie -->
@@ -57,21 +68,30 @@ if ($validSearch) {
        </tbody>
      </table>
 
-    <h3>Actors</h3>
-    <table class="table table-hover">
-      <thead>
-	<tr>
-	  <th>Full Name</th>
-	</tr>
-      </thead>
-      <tbody>
-	<tr>
-	  <td>
-	    <a href="./actor.php?id=1">Tom Hanks</a>
-	  </td>
-	</tr>
-      </tbody>
-    </table>
+     <h3>Actors</h3>
+     <table class="table table-hover">
+       <thead>
+ 	<tr>
+ 	  <th>Full Name</th>
+     <th>Date of Birth</th>
+ 	</tr>
+       </thead>
+       <tbody>
+         <?php
+         // generate row with full name and year
+         while($row = mysql_fetch_row($actorResult)): ?>
+         <?php $row = checkNull($row,''); ?>
+         <tr>
+           <td>
+             <a href="./actor.php?id=<?php echo $row[0];?>"><?php echo $row[1].' '.$row[2];?></a>
+           </td>
+           <td>
+             <a href="./actor.php?id=<?php echo $row[0];?>"><?php echo $row[3];?></a>
+           </td>
+         </tr>
+       <?php endwhile ?>
+       </tbody>
+     </table>
 
   <?php else: ?>
 

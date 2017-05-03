@@ -13,4 +13,14 @@ function connectToDB() {
 
   return $db_connection;
 }
+
+function checkNull(&$testArr, $nullStr){
+  foreach($testArr as &$elem){
+    if(is_null($elem)){
+      $elem=$nullStr;
+    }
+  }
+  unset($elem);
+  return $testArr;
+}
 ?>
