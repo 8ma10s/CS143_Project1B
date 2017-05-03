@@ -8,17 +8,28 @@ $validSearch = !empty($_GET['query']);
 
 if ($validSearch) {
   $query = $_GET['query'];
+
+  //split the words (KW=keywords)
+  $keywords = split(' ', $query);
 }
 ?>
 
 <div class="row">
-  <?php if ($validSearch):
-    // search movie
+  <?php
+  //if search is valid (that is, the search query is not empty)
+  if ($validSearch):
+    // make a string of "title LIKE [keyword]" ANDed with each other
+    $movieKW = array();
+    foreach ($keywords as $key => $keyword){
+      $movieKW[$key] = ' title LIKE "%'.$keyword.'%" ';
+    }
+    $movieCond = join('AND', $movieKW);
+
+    //search movies
     $movieQuery = "SELECT id, title, year
     FROM Movie
-    WHERE title LIKE '%$query%'";
+    WHERE".$movieCond;
     $movieResult = mysql_query($movieQuery, $db_connection); ?>
-
     <h2>Showing Results For "<?php echo $query; ?>"</h2>
     <h3>Movies</h3>
     <table class="table table-hover">
@@ -31,20 +42,20 @@ if ($validSearch) {
       <tbody>
         <?php
         // generate each row with Movie title and Year
-           while($row = mysql_fetch_row($movieResult)){
-             echo "<tr>";
-             echo "<td>";
-             echo "<a href=\"./movie.php?id=".$row[0]."\">".$row[1]."</a>";
-             echo "</td>";
-
-             echo "<td>";
-             echo $row[2];
-             echo "</td>";
-
-             echo "</tr>";
-           } ?>
-      </tbody>
-    </table>
+        while($row = mysql_fetch_row($movieResult)): ?>
+           <tr>
+             <td>
+               <!-- Moie name with link to the page of specific movie -->
+               <a href="./movie.php?id=<?php echo $row[0];?>"><?php echo $row[1];?></a>
+             </td>
+             <td>
+               <!-- Movie Year -->
+               <?php echo $row[2];?>
+             </td>
+           </tr>
+         <?php endwhile ?>
+       </tbody>
+     </table>
 
     <h3>Actors</h3>
     <table class="table table-hover">
