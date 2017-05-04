@@ -35,9 +35,10 @@ if ($validSearch) {
     ORDER BY title, year";
     $movieResult = mysql_query($movieQuery, $db_connection);
 
-    $actorQuery = "SELECT id, first, last, IF(dob,DATE_FORMAT(dob,'%m-%d-%Y'),NULL)
+    $actorQuery = "SELECT id, first, last, IF(dob,DATE_FORMAT(dob,'%Y-%m-%d') ,NULL) as dateStr
     FROM Actor
-    WHERE".$actorCond;
+    WHERE".$actorCond."
+    ORDER BY last, first, dateStr";
     $actorResult = mysql_query($actorQuery, $db_connection);
 
     ?>
