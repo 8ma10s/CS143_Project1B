@@ -2,6 +2,9 @@
 
 <div class="row">
   <h2>Add New Actor</h2>
+  <?php
+  //if not the first time you open the page
+  if(!empty($_GET)): ?>
     <div class="alert alert-success alert-dismissible" role="alert">
       <button type="button" class="close" data-dismiss="alert" ><span>&times;</span></button>
       <?php
@@ -47,8 +50,12 @@
         }
       }
 
+      //if dod is empty, null should be inserted
+      if(empty($_GET['dod'])){
+        $actorInfo['dod'] = '\\N';
+      }
       //if nonempty, dod must match format and be in the correct range
-      if(!empty($_GET['dod'])){
+      else{
         if(!preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/",$_GET['dod'])){
           echo "<strong>Error!</strong> Date of death must be in the format yyyy-mm-dd.<br>";
           $iError=1;
@@ -76,6 +83,8 @@
       }
       ?>
     </div>
+  <?php endif; ?>
+
   <form method="GET" action="#">
     <div class="form-group">
       <label for="firstName">First Names</label>
@@ -86,7 +95,7 @@
       <input type="text" name="lastName" class="form-control"  placeholder="Depp">
     </div>
     <label class="radio-inline">
-      <input type="radio" name="sex" value="m"> Male
+      <input type="radio" name="sex" value="m" checked="checked"> Male
     </label>
     <label class="radio-inline">
       <input type="radio" name="sex" value="f"> Female
