@@ -31,7 +31,8 @@ if ($validSearch) {
     //search movies
     $movieQuery = "SELECT id, title, year
     FROM Movie
-    WHERE".$movieCond;
+    WHERE".$movieCond."
+    ORDER BY title, year";
     $movieResult = mysql_query($movieQuery, $db_connection);
 
     $actorQuery = "SELECT id, first, last, IF(dob,DATE_FORMAT(dob,'%m-%d-%Y'),NULL)
