@@ -4,7 +4,7 @@
 
 
 <div class="row">
-  <h2>Add New Actor</h2>
+  <h2>Add New Actor/Director</h2>
   <?php //if not the first time you open the page ?>
   <?php if(!empty($_GET)) :?>
     <?php
@@ -24,7 +24,7 @@
     }
     $actorInfo['last'] = $_GET['lastName'];
 
-    if(empty($_GET['sex'])){
+    if(empty($_GET['sex']) and $_GET['type'] == 'Actor'){
       $outStr = $outStr."<strong>Error!</strong> You must specify male/female.<br>";
       $iError=1;
     }
@@ -97,8 +97,21 @@
         $maxID = $row[0];
 
         //insert actor/director
-        $insertQuery = 'INSERT INTO Actor
-        VALUES ('.$maxID.',"'.$actorInfo['last'].'","'.$actorInfo['first'].'","'.$actorInfo['sex'].'",'.$actorInfo['dob'].','.$actorInfo['dod'].')';
+
+        $actorInfo['type'] = $_GET['type'];
+        $insertQuery = '';
+
+        //if actor
+        if ($actorInfo['type'] == 'Actor'){
+          $insertQuery = 'INSERT INTO Actor
+          VALUES ('.$maxID.',"'.$actorInfo['last'].'","'.$actorInfo['first'].'","'.$actorInfo['sex'].'",'.$actorInfo['dob'].','.$actorInfo['dod'].')';
+        }
+        //if director
+        else{
+          $insertQuery = 'INSERT INTO Director
+          VALUES ('.$maxID.',"'.$actorInfo['last'].'","'.$actorInfo['first'].'",'.$actorInfo['dob'].','.$actorInfo['dod'].')';
+        }
+
         mysql_query($insertQuery,$db_connection);
       }
       //if query for maxID failed, return error
@@ -111,7 +124,7 @@
       ?>
       <div class="alert alert-success alert-dismissible" role="alert">
         <button type="button" class="close" data-dismiss="alert" ><span>&times;</span></button>
-        <strong>Success!</strong> Actor added to database.<br>
+        <strong>Success!</strong> Actor/Director added to database.<br>
       </div>
     <?php else :?>
       <div class="alert alert-danger alert-dismissible" role="alert">
@@ -122,6 +135,12 @@
   <?php endif; ?>
 
   <form method="GET" action="#">
+    <label class="radio-inline">
+      <input type="radio" name="type" value="Actor" checked="checked"> Actor
+    </label>
+    <label class="radio-inline">
+      <input type="radio" name="type" value="Director"> Director
+    </label>
     <div class="form-group">
       <label for="firstName">First Names</label>
       <input type="text" name="firstName" class="form-control" placeholder="Johnny">
@@ -131,7 +150,7 @@
       <input type="text" name="lastName" class="form-control"  placeholder="Depp">
     </div>
     <label class="radio-inline">
-      <input type="radio" name="sex" value="Male" checked="checked"> Male
+      <input type="radio" name="sex" value="Male"> Male
     </label>
     <label class="radio-inline">
       <input type="radio" name="sex" value="Female"> Female
@@ -143,7 +162,7 @@
     <div class="form-group">
       <label for="dod">Date of Death</label>
       <input type="text" name="dod" class="form-control" placeholder="YYYY-MM-DD">
-      <span id="helpBlock" class="help-block">Leave blank if actor is still alive.</span>
+      <span id="helpBlock" class="help-block">Leave blank if actor/director is still alive.</span>
     </div>
     <button type="submit" class="btn btn-default">Submit</button>
   </form>
