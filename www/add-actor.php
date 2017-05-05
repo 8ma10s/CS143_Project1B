@@ -1,4 +1,7 @@
 <?php include 'header.php';?>
+<?php include 'database.php';?>
+
+
 
 <div class="row">
   <h2>Add New Actor</h2>
@@ -78,6 +81,34 @@
     }
     //if no error, success ?>
     <?php if($iError==0) :?>
+      <?php
+      //open connection
+      $db_connection = connectToDB();
+      // increment maxPersonID
+      $maxID;
+      $maxIDQuery = 'UPDATE MaxPersonID
+      SET id = id + 1';
+      //if incrementind id succeeds, get that incremented maxID
+      if(mysql_query($maxIDQuery, $db_connection)){
+        $maxIDQuery = 'SELECT MAX(id) as maxID
+        FROM MaxPersonID';
+        $result = mysql_query($maxIDQuery, $db_connection);
+        $row = mysql_fetch_row($result);
+        $maxID = $row[0];
+
+        //insert actor/director
+        $insertQuery = 'INSERT INTO Actor
+        VALUES ('.$maxID.',"'.$actorInfo['last'].'","'.$actorInfo['first'].'","'.$actorInfo['sex'].'",'.$actorInfo['dob'].','.$actorInfo['dod'].')';
+        mysql_query($insertQuery,$db_connection);
+      }
+      //if query for maxID failed, return error
+      else{
+        echo "Your input was correct, but the server failed to insert your input. Try again.<br>";
+      }
+
+      //either way, close connection
+      mysql_close($db_connection);
+      ?>
       <div class="alert alert-success alert-dismissible" role="alert">
         <button type="button" class="close" data-dismiss="alert" ><span>&times;</span></button>
         <strong>Success!</strong> Actor added to database.<br>
@@ -100,10 +131,10 @@
       <input type="text" name="lastName" class="form-control"  placeholder="Depp">
     </div>
     <label class="radio-inline">
-      <input type="radio" name="sex" value="m" checked="checked"> Male
+      <input type="radio" name="sex" value="Male" checked="checked"> Male
     </label>
     <label class="radio-inline">
-      <input type="radio" name="sex" value="f"> Female
+      <input type="radio" name="sex" value="Female"> Female
     </label>
     <div class="form-group">
       <label for="dob">Date of Birth</label>
