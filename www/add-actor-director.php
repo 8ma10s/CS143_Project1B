@@ -6,42 +6,42 @@
 <div class="row">
   <h2>Add New Actor/Director</h2>
   <?php //if not the first time you open the page ?>
-  <?php if(!empty($_GET)) :?>
+  <?php if(!empty($_POST)) :?>
     <?php
     $iError= 0; //input error
     $actorInfo = array(); //store all info about actor being added
     $outStr = ""; //store all strings that need to be outputted at the end
     // check that each necessary field is not empty. if empty, return error
-    if(empty($_GET['firstName'])){
+    if(empty($_POST['firstName'])){
       $outStr = $outStr."<strong>Error!</strong> First name cannot be empty.<br>";
       $iError=1;
     }
-    $actorInfo['first'] = $_GET['firstName'];
+    $actorInfo['first'] = $_POST['firstName'];
 
-    if(empty($_GET['lastName'])){
+    if(empty($_POST['lastName'])){
       $outStr = $outStr."<strong>Error!</strong> Last name cannot be empty.<br>";
       $iError=1;
     }
-    $actorInfo['last'] = $_GET['lastName'];
+    $actorInfo['last'] = $_POST['lastName'];
 
-    if(empty($_GET['sex']) and $_GET['type'] == 'Actor'){
+    if(empty($_POST['sex']) and $_POST['type'] == 'Actor'){
       $outStr = $outStr."<strong>Error!</strong> You must specify male/female.<br>";
       $iError=1;
     }
-    $actorInfo['sex'] = $_GET['sex'];
+    $actorInfo['sex'] = $_POST['sex'];
 
-    if(empty($_GET['dob'])){
+    if(empty($_POST['dob'])){
       $outStr = $outStr."<strong>Error!</strong> Date of birth cannot be empty.<br>";
       $iError=1;
     }
 
     //dob must match format and be in the correct range
-    else if(!preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/",$_GET['dob'])){
+    else if(!preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/",$_POST['dob'])){
       $outStr = $outStr."<strong>Error!</strong> Date of birth must be in the format yyyy-mm-dd.<br>";
       $iError=1;
     }
     else{
-      $actorInfo['dob'] = str_replace("-","",$_GET['dob']);
+      $actorInfo['dob'] = str_replace("-","",$_POST['dob']);
       //separate year, month, and day component of the string dob
       $yr = substr($actorInfo['dob'], 0, 4);
       $mo = substr($actorInfo['dob'],4,2);
@@ -53,17 +53,17 @@
     }
 
     //if dod is empty, null should be inserted
-    if(empty($_GET['dod'])){
+    if(empty($_POST['dod'])){
       $actorInfo['dod'] = '\\N';
     }
     //if nonempty, dod must match format and be in the correct range
     else{
-      if(!preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/",$_GET['dod'])){
+      if(!preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/",$_POST['dod'])){
         $outStr = $outStr."<strong>Error!</strong> Date of death must be in the format yyyy-mm-dd.<br>";
         $iError=1;
       }
       else{
-        $actorInfo['dod'] = str_replace("-","",$_GET['dod']);
+        $actorInfo['dod'] = str_replace("-","",$_POST['dod']);
         //separate year, month, and day component of the string dod
         $yr = substr($actorInfo['dod'], 0, 4);
         $mo = substr($actorInfo['dod'],4,2);
@@ -98,7 +98,7 @@
 
         //insert actor/director
 
-        $actorInfo['type'] = $_GET['type'];
+        $actorInfo['type'] = $_POST['type'];
         $insertQuery = '';
 
         //if actor
@@ -134,7 +134,7 @@
     <?php endif; ?>
   <?php endif; ?>
 
-  <form method="GET" action="#">
+  <form method="POST" action="#">
     <label class="radio-inline">
       <input type="radio" name="type" value="Actor" checked="checked"> Actor
     </label>
