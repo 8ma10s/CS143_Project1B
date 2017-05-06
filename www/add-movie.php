@@ -2,6 +2,63 @@
 
 <div class="row">
   <h2>Add New Movie</h2>
+  <?php if(!empty($_POST)) :?>
+    <?php
+    $iError = 0; //input error
+    $movieInfo = array(); //array to store all information from _POST after formatting
+    $outStr = ''; //this is used as an output of error message (if any)
+
+    //check that each necessary field is not empty. if empty, set error message
+    //title
+    if(empty($_POST['title'])){
+      $outStr = $outStr."<strong>Error!</strong> Movie title cannot be empty.<br>";
+      $iError=1;
+    }
+    $movieInfo['title']=$_POST['title'];
+
+    //year is empty
+    if(empty($_POST['year'])){
+      $outStr = $outStr."<strong>Error!</strong> Release year cannot be empty.<br>";
+      $iError=1;
+    }
+    //else if year is not in yyyy format
+    else if(!preg_match("/^[0-9]{4}$/",$_POST['year'])){
+      $outStr = $outStr."<strong>Error!</strong> Release year must be in the form yyyy.<br>";
+      $iError=1;
+    }
+    $movieInfo['year']=$_POST['year'];
+
+    //no need to worry about MPAA rating because field only allows selection of predetermined VALUES
+    $movieInfo['rating'] = $_POST['rating'];
+
+    //production company is empty
+    if(empty($_POST['company'])){
+      $outStr = $outStr."<strong>Error!</strong> Production Company cannot be empty.<br>";
+      $iError=1;
+    }
+    $movieInfo['company'] = $_POST['company'];
+
+    //no genre selected
+    if(empty($_POST['genre'])){
+      $outStr = $outStr."<strong>Error!</strong> You must select at least one genre<br>";
+      $iError=1;
+    }
+    $movieInfo['genre'] = $_POST['genre'];
+    ?>
+
+    <?php if($iError == 0) :?>
+      <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" ><span>&times;</span></button>
+        <strong>Success!</strong> Movie added to database.<br>
+      </div>
+    <?php else :?>
+      <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" ><span>&times;</span></button>
+        <?php echo $outStr; ?>
+      </div>
+    <?php endif; ?>
+  <?php endif; ?>
+  
   <form method="POST" action="#">
     <div class="form-group">
       <label for="title">Title</label>
@@ -57,7 +114,7 @@
    $( ".select2" ).select2({
      theme: "bootstrap"
    })
-   
+
  })
 </script>
 <?php include 'footer.php' ?>
