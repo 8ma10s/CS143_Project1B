@@ -35,8 +35,7 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Add <span class="caret"></span></a>
               <ul class="dropdown-menu">
-		<li><a href="./add-actor.php">Actor</a></li>
-		<li><a href="./add-director.php">Director</a></li>
+		<li><a href="./add-actor-director.php">Actor/Director</a></li>
 		<li><a href="./add-movie.php">Movie</a></li>
 		<li role="separator" class="divider"></li>
 		<li><a href="./add-movie-actor-relation.php">Movie/Actor Relation</a></li>
