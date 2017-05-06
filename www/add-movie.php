@@ -1,4 +1,5 @@
 <?php include 'header.php';?>
+<?php include 'database.php';?>
 
 <div class="row">
   <h2>Add New Movie</h2>
@@ -46,7 +47,43 @@
     $movieInfo['genre'] = $_POST['genre'];
     ?>
 
+    <?php //check for errors ?>
     <?php if($iError == 0) :?>
+      <?php
+      //open connection to database
+      $db_connection = connectToDB();
+
+      // increment maxPersonID
+      $maxID;
+      $maxIDQuery = 'UPDATE MaxMovieID
+      SET id = id + 1';
+      //if incrementind id succeeds, get that incremented maxID
+      if(mysql_query($maxIDQuery, $db_connection)){
+        $maxIDQuery = 'SELECT MAX(id) as maxID
+        FROM MaxMovieID';
+        $result = mysql_query($maxIDQuery, $db_connection);
+        $row = mysql_fetch_row($result);
+        $maxID = $row[0];
+
+        //insert movie information
+        $insertQuery = 'INSERT INTO Movie
+        VALUES ('.$maxID.',"'.$movieInfo['title'].'",'.$movieInfo['year'].',"'.$movieInfo['rating'].'", "'.$movieInfo['company'].'")';
+        mysql_query($insertQuery, $db_connection);
+
+        //insert selected genre
+        foreach($movieInfo['genre'] as $genre){
+          $insertQuery = 'INSERT INTO MovieGenre
+          VALUES ('.$maxID.', "'.$genre.'")';
+          mysql_query($insertQuery, $db_connection);
+        }
+
+      }
+      else{
+        echo "Your input was correct, but the server failed to insert your input. Try again.<br>";
+      }
+      //close connection
+      mysql_close($db_connection);
+      ?>
       <div class="alert alert-success alert-dismissible" role="alert">
         <button type="button" class="close" data-dismiss="alert" ><span>&times;</span></button>
         <strong>Success!</strong> Movie added to database.<br>
@@ -58,7 +95,7 @@
       </div>
     <?php endif; ?>
   <?php endif; ?>
-  
+
   <form method="POST" action="#">
     <div class="form-group">
       <label for="title">Title</label>
@@ -84,7 +121,7 @@
     </div>
     <div class="form-group">
       <label for="genre">Genres</label>
-      <select name="genre" class="select2 form-control" multiple="multiple">
+      <select name="genre[]" class="select2 form-control" multiple="multiple">
 	<option value="Action">Action</option>
 	<option value="Adult">Adult</option>
 	<option value="Animation">Animation</option>
