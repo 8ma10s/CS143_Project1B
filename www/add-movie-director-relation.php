@@ -35,7 +35,7 @@ $directorResults = mysql_query($directorQuery, $db_connection);
 <?php include 'header.php';?>
 
 <div class="row">
-  <h2>Add Actor/Movie Relation</h2>
+  <h2>Add Director/Movie Relation</h2>
   <?php if ($isValid): ?>
     <div class="alert alert-success alert-dismissible" role="alert">
       <button type="button" class="close" data-dismiss="alert" ><span>&times;</span></button>
